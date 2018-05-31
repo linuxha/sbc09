@@ -56,6 +56,19 @@ FILE *logfile;
 FILE *infile;
 FILE *xfile;
 
+void vHelp() {
+    printf("L - L<filename> - Log            (W)\n");
+    printf("S - S<filename> - S              (R)\n");
+    printf("X - eXit\n");
+    printf("U - U<filename> - Upload         (R)\n");
+    printf("D - D<filename> - Download       (W)\n");
+    printf("R - Reset\n");
+    printf("> - ><filename> - SREC to file   (W)\n");
+    printf("< - <<filename> - SREC from file (R)\n");
+    printf("H - Help\n");
+    printf("? - Help\n");
+}
+
 int char_input(void) {
 	int c, w, sum;
 	if (!xmstat) {
@@ -214,7 +227,7 @@ void do_exit(void) {
 void do_escape(void) {
 	char s[80];
 	restore_term();
-	printf("v09>");
+	printf("v09> ");
 	fgets(s, 80, stdin);
 	if (s[0])
 		s[strlen(s) - 1] = 0;
@@ -277,6 +290,10 @@ void do_escape(void) {
 		break;
 	case 'R':
 		pcreg = (mem[0xfffe] << 8) + mem[0xffff];
+        case 'H':
+        case '?':
+                vHelp();
+                break;
 	}
 	if (!tracing)
 		attention = 0;
