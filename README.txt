@@ -33,6 +33,9 @@ there are usually differences and the documentation seems to be out of sync. I i
 to merge what I can, fix the documentation and modernize the code a bit. I'm not sure
 this is a good or bad idea but if you don't like it you can fork the code. :smile:
 
+I've added a -f and -a option (see below) to allow you to use a different rom file and
+to move the ACIA.
+
 This simulator contain 3 program, a09, makerom and v09.
 
 ### a09
@@ -193,8 +196,9 @@ H is set on VCC but not on real 6809, sim6809 does what?
 ```
 $ ./v09 -h
 v09 1.0.1
-Usage: v09 [-t tracefile [-l addr] [-h addr] ] [-e escchar] [-f filenom.rom] 
-Default filename is v09.rom
+Usage: v09 [-t tracefile [-l addr] [-h addr] ] [-e escchar] [-f filenom.rom] [-a 0xE000]
+Default filename is v09.rom (if no -f is used)
+Default ACIA locateion: 0xE000 (if no -a is used)
 ```
 
 ### start program
@@ -217,6 +221,7 @@ Don't attempt a memory dump, this isn't currently an option. This is one of this
 
 ### Bugfixes
 
+ * 20180531 - Added -a to allow the ACIA to be moved from 0xE000
  * 20180531 - Actually added the -f filename.rom to the options so you can run with files other than v09.rom
 
  * static int index;
