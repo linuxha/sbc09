@@ -1,0 +1,1075 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>SBC09, an Emulator for a 6809-Based Single Board Compuer.</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.cse.ohio-state.edu/~gurari/TeX4ht/)"> 
+<!-- html --> 
+<meta name="src" content="sbc09.tex"> 
+<meta name="date" content="2018-05-31 12:43:00"> 
+<link rel="stylesheet" type="text/css" href="sbc09.css"> 
+</head><body 
+>
+   <div class="maketitle">
+
+
+<h2 class="titleHead">SBC09, an Emulator for a 6809-Based Single Board
+Compuer.</h2>
+<div class="author" ><span 
+class="cmr-12x-x-120">L.C. Benschop</span></div><br />
+<div class="date" ><span 
+class="cmr-12x-x-120">May 31, 2018</span></div>
+
+   </div>
+
+   <h2 class="likechapterHead"><a 
+ id="x1-1000"></a>Contents</h2> <div class="tableofcontents">
+   <span class="chapterToc" >1 <a 
+href="#x1-20001" id="QQ2-1-2">Introduction</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1.1 <a 
+href="#x1-30001.1" id="QQ2-1-3">A Bit of Background on SBCs.</a></span>
+<br />   &#x00A0;<span class="sectionToc" >1.2 <a 
+href="#x1-40001.2" id="QQ2-1-4">The Emulated System.</a></span>
+<br />   <span class="chapterToc" >2 <a 
+href="#x1-50002" id="QQ2-1-6">Building the Programs.</a></span>
+<br />   <span class="chapterToc" >3 <a 
+href="#x1-60003" id="QQ2-1-7">The 6809 Assembler <span 
+class="cmtt-12">a09</span>.</a></span>
+<br />   <span class="chapterToc" >4 <a 
+href="#x1-70004" id="QQ2-1-8">The Virtual SBC <span 
+class="cmtt-12">v09</span>.</a></span>
+<br />   <span class="chapterToc" >5 <a 
+href="#x1-80005" id="QQ2-1-9">Machine Language Monitor.</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >5.0.1 <a 
+href="#x1-90005.0.1" id="QQ2-1-10">Getting Started.</a></span>
+<br />   &#x00A0;<span class="sectionToc" >5.1 <a 
+href="#x1-100005.1" id="QQ2-1-11">Use of the monitor commands</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >5.1.1 <a 
+href="#x1-110005.1.1" id="QQ2-1-12">Single Letter Commands</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >5.1.2 <a 
+href="#x1-120005.1.2" id="QQ2-1-13">S-Records Related Commands.</a></span>
+<br />   &#x00A0;&#x00A0;<span class="subsectionToc" >5.1.3 <a 
+href="#x1-130005.1.3" id="QQ2-1-14">X-Modem Related Commands.</a></span>
+<br />   &#x00A0;<span class="sectionToc" >5.2 <a 
+href="#x1-140005.2" id="QQ2-1-15">Memory Map</a></span>
+<br />   &#x00A0;<span class="sectionToc" >5.3 <a 
+href="#x1-150005.3" id="QQ2-1-16">Operating System Facilities</a></span>
+<br />   &#x00A0;<span class="sectionToc" >5.4 <a 
+href="#x1-160005.4" id="QQ2-1-17">Extending the built-in Assembler</a></span>
+<br />   <span class="chapterToc" >6 <a 
+href="#x1-170006" id="QQ2-1-18">The Forth Language.</a></span>
+<br />   <span class="chapterToc" >7 <a 
+href="#x1-180007" id="QQ2-1-19">The BASIC Interpreter.</a></span>
+<br />   <span class="chapterToc" >8 <a 
+href="#x1-190008" id="QQ2-1-20">History of the Project.</a></span>
+<br />   &#x00A0;<span class="sectionToc" >8.1 <a 
+href="#x1-200008.1" id="QQ2-1-21">Introduction.</a></span>
+<br />   &#x00A0;<span class="sectionToc" >8.2 <a 
+href="#x1-210008.2" id="QQ2-1-22">The 6809 Emulator in Forth.</a></span>
+<br />   &#x00A0;<span class="sectionToc" >8.3 <a 
+href="#x1-220008.3" id="QQ2-1-24">The Assembler and Simulator in C.</a></span>
+<br />   &#x00A0;<span class="sectionToc" >8.4 <a 
+href="#x1-230008.4" id="QQ2-1-25">The Virtual SBC.</a></span>
+   </div>
+
+   <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;1</span><br /><a 
+ id="x1-20001"></a>Introduction</h2>
+<!--l. 11--><p class="noindent" >The <span 
+class="cmtt-12">sbc09 </span>package contains an emulator of a 6809-based single board computer that runs under
+UNIX. It contains all the programs needed to work with the emulator, such as the emulator
+itself, an assembler, a monitor program, a BASIC interpreter, a Forth interpreter, several
+example programs and several tools needed to build the programs. The program should work
+under most more-or-less POSIX-compliant versions of UNIX and they were developed under
+Linux. Of course I believe that the programs that currently run on the emulator would also run
+on a real 6809 machine.
+   <h3 class="sectionHead"><span class="titlemark">1.1   </span> <a 
+ id="x1-30001.1"></a>A Bit of Background on SBCs.</h3>
+<!--l. 22--><p class="noindent" >In the seventies you could buy single board microcomputers that had a hexadecimal keypad and
+7-segment displays. These computers typically had less than 1 kilobyte of RAM and a simple
+monitor program in ROM. An interface to a cassette recorder (or paper tape reader/writer) and
+a terminal was possible, but not standard. The typical way to program the machine was entering
+hexadecimal machine codes on the keypad. Machine code was the only language in
+which you could program them, especially if you only had a hexadecimal keypad and
+7-segment led displays. You typically used these machines to experiment with hardware
+interfacing, as games and calculations were a bit limited with only six 7-sengment
+digits.
+<!--l. 33--><p class="indent" >   Next came simple home computers, like the TRS80, the Apple ][ and the Commodore PET.
+These machines had BASIC in ROM and they used a simple cassette recorder to store data.
+These computers had a TV or a low quality monitor as display and a QWERTY keyboard. These
+machines could be upgraded with a floppy disk drive and a printer and then they could be used
+for professional work. These machines had 4 to 64 kilobyts of memory. Apart from assembly
+language you could use BASIC, Forth and sometimes Pascal to program these machines. Most
+useful programs (and the best games) were programmed in assembly language. Many of these
+machines had BASIC in ROM and no machine code monitor. You had to load that
+separately.
+<!--l. 45--><p class="indent" >   Today we have personal computers that run DOS, Windows, UNIX or something else.
+New computers have 4 to 16 megabytes of RAM and hard disks of more than 500
+Megabytes. Apart from having in the order of 1000 times more storage, they are also
+1000 times faster than the old 8-bit home computers. Programming? You can use
+Visual BASIC, C++ and about every other programming language on the planet. But
+programs have become bigger and bigger. Programming is not the same as it was
+before.
+<!--l. 53--><p class="indent" >   I guess there is some demand for small 8-bit computer systems that are simple to build,
+easy to interface to all kinds of hobby projects, fun to program and small enough
+to integrate into a home-built project. Do we want to use hexadecimal keyboards
+and 7-segment displays? I guess not many people want to use them. Do we want to
+use a cassette recorder for data storage and a TV as a display? Not me. And if you
+build your own 8-bit microprocessor, do you want to waste your time and money on
+a hexadecimal keypad or a cassette interface that you do not like to use and that
+
+you do not need anyway? PCs of five years ago are more than adequate to run an
+editor, a terminal program and a cross assembler for your favourite 8-bit processor. The
+terminal program can then be used to send the programs to the 8-bit micro. If you
+equip an 8-bit system with some static CMOS RAM, a serial interface and a monitor
+in ROM, you can use the keyboard, hard disk and monitor of your PC for program
+development and the 8-bit micro can be disconnected from the PC and do its task, once it is
+programmed.
+<!--l. 70--><p class="indent" >   Cross development is nothing special. How do you think the microprocessor in you microwave
+was programmed? But it is not practical for a hobbyist to program an EPROM for each program
+change. Professional developers of embedded processors have expensive tools, like ROM
+emulators, processor emulators etc. to see what the processor is doing on its way to the next
+crash. For a hobbyist it is much more practical to have a slightly more expensive embedded
+computer that you can run an interactive debugger on. And you are not even limited to assembly
+language. If you have 32k ROM you can have both the monitor program and a BASIC
+interpreter and some aplication code in ROM. Nothing prevents you from having Forth as
+well.
+<!--l. 81--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">1.2   </span> <a 
+ id="x1-40001.2"></a>The Emulated System.</h3>
+<!--l. 83--><p class="noindent" ><hr class="figure"><div class="figure" 
+>
+
+<a 
+ id="x1-40011"></a>
+
+<!--l. 2--><p class="center" ><img 
+src="sbc090x.png" alt="PICT" >
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;1.1: </span><span  
+class="content">Block Diagram of SBC.</span></div><!--tex4ht:label?: x1-40011 -->
+
+<!--l. 86--><p class="noindent" ></div><hr class="endfigure">
+<!--l. 88--><p class="indent" >   The program <span 
+class="cmtt-12">sbc09 </span>emulates the abovementioned single board computer <span 
+class="cmti-12">plus </span>the terminal
+program that communicates with it.
+
+   <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;2</span><br /><a 
+ id="x1-50002"></a>Building the Programs.</h2>
+
+   <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;3</span><br /><a 
+ id="x1-60003"></a>The 6809 Assembler <span 
+class="cmtt-12">a09</span>.</h2>
+<!--l. 95--><p class="noindent" >The assembler is a09. Run it with
+
+   <div class="verbatim" id="verbatim-1">
+&#x00A0;a09&#x00A0;[-l&#x00A0;listing]&#x00A0;[-o&#x00A0;object|-s&#x00A0;object]&#x00A0;source
+</div>
+<!--l. 98--><p class="nopar" >
+<!--l. 100--><p class="indent" >   Source is a mandatory argument. The -l listing and <span 
+class="cmtt-12">-o </span>or <span 
+class="cmtt-12">-s </span>object arguments are optional.
+By default there is no listing and the object file is the sourcefile name without an
+extension and if the source file name has no extension it is the source file name with <span 
+class="cmtt-12">.b</span>
+extension.
+<!--l. 106--><p class="indent" >   A09 recognizes standard 6809 mnemonics. Labels should start in the first column and may or
+may not be terminated by a colon. Every line starting with a non-alphanumeric is taken
+to be a comment line. Everything after the operand field is taken to be comment.
+There is a full expression evaluator with C-style operators (and Motorola style number
+bases).
+<!--l. 112--><p class="indent" >   There are the usual pseudo-ops such as ORG EQU SET SETDP RMB FCB FDB FCC etc.
+Strings within double quotes may be mixed with numbers on FCB lines. There is
+conditional assembly with IF/ELSE/ENDIF and there is INCLUDE. The assembler is
+case-insensitive.
+<!--l. 117--><p class="indent" >   The object file is either a binary image file (-o) or Motorola S-records (-s). In the former case
+it contains a binary image of the assembled data starting at the first address where something is
+assembled. In the following case
+
+   <div class="verbatim" id="verbatim-2">
+ORG&#x00A0;0
+&#x00A0;<br />VAR1 RMB&#x00A0;2
+&#x00A0;<br />VAR2 RMB&#x00A0;2
+&#x00A0;<br />
+&#x00A0;<br />ORG&#x00A0;$100
+&#x00A0;<br />START LDS&#x00A0;#$400
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;...
+</div>
+<!--l. 128--><p class="nopar" >
+<!--l. 130--><p class="indent" >   the RMB statements generate no data so the object file contains the memory image from
+address $100.
+<!--l. 133--><p class="indent" >   The list file contains no pretty lay-out and no pagination. It is assumed that utilities (Unix pr
+or enscript) are available for that.
+<!--l. 136--><p class="indent" >   There are no macros and no linkable modules yet. Some provisions are taken for it in the
+code.
+<!--l. 139--><p class="indent" >   After the assembler has finished, it prints the number of pass 2 errors. This should be zero. So
+if you see
+
+   <div class="verbatim" id="verbatim-3">
+&#x00A0;&#x00A0;0&#x00A0;Pass&#x00A0;2&#x00A0;Errors.
+</div>
+<!--l. 143--><p class="nopar" > then you are lucky.
+
+   <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;4</span><br /><a 
+ id="x1-70004"></a>The Virtual SBC <span 
+class="cmtt-12">v09</span>.</h2>
+<!--l. 148--><p class="noindent" >The simulator is v09. Run it with
+
+   <div class="verbatim" id="verbatim-4">
+&#x00A0;&#x00A0;v09&#x00A0;[-t&#x00A0;tracefile&#x00A0;[-tl&#x00A0;tracelo]&#x00A0;[-th&#x00A0;tracehi]]&#x00A0;[-e&#x00A0;escchar]
+</div>
+<!--l. 151--><p class="nopar" >
+<!--l. 153--><p class="indent" >   <span 
+class="cmtt-12">tracelo </span>and <span 
+class="cmtt-12">tracehi </span>are addresses. They can be entered in decimal, octal or hex using the C
+conventions for number input.
+<!--l. 156--><p class="indent" >   If a tracefile is specified, all instructions at addresses between <span 
+class="cmtt-12">tracelo </span>and <span 
+class="cmtt-12">tracehi </span>are
+traced. Tracing information such as program location, register contents and opcodes are written
+to the trace file.
+<!--l. 160--><p class="indent" >   <span 
+class="cmtt-12">escchar </span>is the escape character. It must be entered as a number. This is the character that
+you must type to get the v09 prompt. This is control-] by default. (0x1d)
+<!--l. 164--><p class="indent" >   The program loads its ROM image from the file <span 
+class="cmtt-12">v09.rom</span>, which is a 32 kiliobyte
+binary file. This file should have been generated by the <span 
+class="cmtt-12">Makefile</span>. The program starts
+executing at the address found at $FFFE in the ROM, just like a real 6809 would do on
+reset.
+<!--l. 169--><p class="indent" >   The address map is as follows.
+      <dl class="description"><dt class="description">
+<span 
+class="cmbx-12">$0000&#8211;$7FFF</span> </dt><dd 
+class="description">RAM.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">$8000&#8211;$FFFF</span> </dt><dd 
+class="description">ROM (except the I/O addresses). These addresses are write-protected.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">$E000&#8211;$E0FF</span> </dt><dd 
+class="description">I/O addresses. Currently only one ACIA is mapped.</dd></dl>
+<!--l. 177--><p class="indent" >   At addresses $E000 and $E001 there is an emulated serial port (ACIA). All bytes sent to it
+(or read from it) are send to (read from) the terminal and sometimes to/from a file. Terminal
+I/O is in raw mode.
+<!--l. 182--><p class="indent" >   If you press the escape char, you get the v09 prompt. At the prompt you can enter the
+following things.
+      <dl class="description"><dt class="description">
+<span 
+class="cmbx-12">X</span> </dt><dd 
+class="description">to exit the simulator.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">R</span> </dt><dd 
+class="description">to reset the emulated 6809 (very useful).
+      </dd><dt class="description">
+<span 
+class="cmbx-12">Lfilename</span> </dt><dd 
+class="description">(no space in between) to log terminal output to a file. Control chars and cr are
+      filtered to make the output a normal text file. L without a file name stops logging.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">Sfilename</span> </dt><dd 
+class="description">to send a specified file to the simulator through its terminal input. LF is
+      converted to CR to mimic raw terminal input.
+
+      </dd><dt class="description">
+<span 
+class="cmbx-12">Ufilename</span> </dt><dd 
+class="description">(terminal upload command) to send a file to the 6809 using the X-modem
+      protocol. The 6809 must already run an X-modem receiving program.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">Dfilename</span> </dt><dd 
+class="description">(terminal  download  command)  to  receive  a  file  from  the  6809  using  the
+      X-modem protocol. The 6809 must already run an X-modem sending program.</dd></dl>
+<!--l. 199--><p class="noindent" >All of these commands, except the R command, can be seen as commands of the communication
+program that is used to access the single board computer. The R command is a subsitute for
+pushing the RESET button on the emulated computer.
+
+   <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;5</span><br /><a 
+ id="x1-80005"></a>Machine Language Monitor.</h2>
+<!--l. 206--><p class="noindent" >The program <span 
+class="cmtt-12">monitor.asm </span>is a program that is intended to be included in the ROM of a 6809
+based single board computer. The program allows a user to communicate with the single board
+computer through a serial port. It allows a user to enter machine code, examine memory and
+registers, to set breakpoints, to trace a program and more. Furthermore, data can
+be sent to and be received from the single board computer through the X-MODEM
+protocol.
+   <h4 class="subsectionHead"><span class="titlemark">5.0.1   </span> <a 
+ id="x1-90005.0.1"></a>Getting Started.</h4>
+<!--l. 215--><p class="noindent" >If you start v09 with the standard ROM, then you will run the monitor program. If all goes well
+you see something like
+
+   <div class="verbatim" id="verbatim-5">
+Welcome&#x00A0;to&#x00A0;BUGGY&#x00A0;1.0
+</div>
+<!--l. 220--><p class="nopar" > and you can type text. Excellent, you are now running 6809 code.
+<!--l. 223--><p class="indent" >   The following example programs you can run from the 6809 monitor. All of them start at
+address $400. For example to run the program bin2dec you type.
+<!--l. 227--><p class="indent" >   XL400
+<!--l. 229--><p class="indent" >   Then press your escape character (default is control-] ).
+<!--l. 231--><p class="indent" >   Then at the v09 prompt type
+<!--l. 233--><p class="indent" >   ubin2dec
+<!--l. 235--><p class="indent" >   Now you see some lines displaying the progress of the X-modem session. If that is finished,
+you type
+<!--l. 238--><p class="indent" >   G400
+<!--l. 240--><p class="indent" >   Now it runs and exits to the monitor with SWI, so that the registers are displayed.
+      <dl class="description"><dt class="description">
+<span 
+class="cmbx-12">cond09.asm</span> </dt><dd 
+class="description">
+      </dd><dt class="description">
+<span 
+class="cmbx-12">cond09.inc</span> </dt><dd 
+class="description">Nonsense program to show conditional assembly and the like.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">bench09.asm</span> </dt><dd 
+class="description">Benchmark program. Executes tight loop. Takes 83 secs on 25 MHz 386.
+      Should take about 8 sec. on 1MHz real 6809. :-(
+      </dd><dt class="description">
+<span 
+class="cmbx-12">test09.asm</span> </dt><dd 
+class="description">Tests some nasty features of the 6809. Prints a few lines of PASSED nn and
+      should never print ERROR nn.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">bin2dec.asm</span> </dt><dd 
+class="description">Unusual way to convert numbers to decimal using DAA instruction. Prints
+      some test numbers.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">basic.asm</span> </dt><dd 
+class="description">Tiny BASIC by John Byrns. Docs are in basic.doc. To test it start the monitor
+      and run basic.
+      <!--l. 259--><p class="noindent" >Then press your escape char. At the v09 prompt type: sexampl.bas
+      <!--l. 262--><p class="noindent" >Now a BASIC program is input. Type RUN to run it.
+      <!--l. 265--><p class="noindent" >Leave BASIC by pressing the escape char and entering x at the prompt.</dd></dl>
+
+<!--l. 270--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">5.1   </span> <a 
+ id="x1-100005.1"></a>Use of the monitor commands</h3>
+<!--l. 273--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">5.1.1   </span> <a 
+ id="x1-110005.1.1"></a>Single Letter Commands</h4>
+      <dl class="description"><dt class="description">
+<span 
+class="cmbx-12">D</span> </dt><dd 
+class="description">Dump memory.
+      <!--l. 278--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Daddr,len</span> </dt><dd 
+class="description">Hex/ascii dump of memory region.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">Daddr</span> </dt><dd 
+class="description">length=64 bytes by default.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">D</span> </dt><dd 
+class="description">address is address after previous dump by default.</dd></dl>
+      <!--l. 285--><p class="noindent" >Examples:
+
+      <div class="verbatim" id="verbatim-6">
+      DE400,100
+</div>
+      <!--l. 288--><p class="nopar" > Dump 256 bytes starting at $E400
+
+      <div class="verbatim" id="verbatim-7">
+      D
+</div>
+      <!--l. 292--><p class="nopar" > Dump the next 64 bytes.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">E</span> </dt><dd 
+class="description">Enter data into memory,
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Eaddr bytes</span> </dt><dd 
+class="description">Enter hexadecimal bytes at address.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">Eaddr&#8221;ascii&#8221;</span> </dt><dd 
+class="description">Enter ascii at address.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">Eaddr</span> </dt><dd 
+class="description">Enter interactively at address (until empty line).</dd></dl>
+      <!--l. 303--><p class="noindent" >Examples:
+
+      <div class="verbatim" id="verbatim-8">
+      E0400&#x00A0;86449D033F
+</div>
+      <!--l. 306--><p class="nopar" > Enter the bytes 86 44 9D 03 3F at address $400.
+
+      <div class="verbatim" id="verbatim-9">
+      E5000"Welcome"
+</div>
+      <!--l. 310--><p class="nopar" > Enter the ASCII codes of &#8221;Welcome&#8221; at address $400.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">F</span> </dt><dd 
+class="description">Find string in memory.
+      <!--l. 315--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Faddr bytes</span> </dt><dd 
+class="description">Find byte string string from address.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">Faddr&#8221;ascii&#8221;</span> </dt><dd 
+class="description">Find ASCII string.</dd></dl>
+      <!--l. 321--><p class="noindent" >Find the specified string in memory, starting at the specified address. The I/O
+      addresses $E000-$E0FF are skipped. The addresses of the first 16 occurrences are
+      shown.
+      <!--l. 325--><p class="noindent" >Example:
+
+      <div class="verbatim" id="verbatim-10">
+      FE400"SEX"
+</div>
+      <!--l. 328--><p class="nopar" > Search for the word &#8221;SEX&#8221; starting in the monitor.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">M</span> </dt><dd 
+class="description">Move memory region.
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Maddr1,addr2,len</span> </dt><dd 
+class="description">Move region of memory from addr1 to addr2. If addr2 is 1
+           higher than addr1, a region is filled.</dd></dl>
+      <!--l. 338--><p class="noindent" >Example:
+
+      <div class="verbatim" id="verbatim-11">
+      &#x00A0;M400,500,80
+</div>
+      <!--l. 341--><p class="nopar" > Move 128 bytes from address $400 to $500.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">A</span> </dt><dd 
+class="description">Assemble instructions.
+      <!--l. 346--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Aaddr</span> </dt><dd 
+class="description">Enter line-by-line assembler.</dd></dl>
+      <!--l. 351--><p class="noindent" >You are in the assembler until you make an error or until you enter an empty
+      line.
+      <!--l. 354--><p class="noindent" >Example:
+
+      <div class="verbatim" id="verbatim-12">
+      A400
+      &#x00A0;<br />LDB&#x00A0;#$4B
+      &#x00A0;<br />JSR&#x00A0;$03
+      &#x00A0;<br />SWI
+      &#x00A0;<br />&#x003C;empty&#x00A0;line&#x003E;
+</div>
+      <!--l. 361--><p class="nopar" >
+      </dd><dt class="description">
+<span 
+class="cmbx-12">U</span> </dt><dd 
+class="description">Disassemble instructions.
+      <!--l. 365--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Uaddr,len</span> </dt><dd 
+class="description">Disassemble memory region.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">Uaddr</span> </dt><dd 
+class="description">(disassemble 21 bytes)
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">U</span> </dt><dd 
+class="description"></dd></dl>
+      <!--l. 372--><p class="noindent" >Examples:
+
+      <div class="verbatim" id="verbatim-13">
+      UE400,20
+</div>
+      <!--l. 375--><p class="nopar" > Diassemble first 32 bytes of monitor program.
+
+      <div class="verbatim" id="verbatim-14">
+      U
+</div>
+      <!--l. 379--><p class="nopar" > Disassemble next 21 bytes.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">B</span> </dt><dd 
+class="description">Set, clear and show breakpoints.
+      <!--l. 384--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Baddr</span> </dt><dd 
+class="description">Set/reset breakpoint at address.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">B</span> </dt><dd 
+class="description">Display active breakpoints.</dd></dl>
+      <!--l. 389--><p class="noindent" >Four breakpoints can be active simultaneously.
+      <!--l. 391--><p class="noindent" >Examples:
+
+      <div class="verbatim" id="verbatim-15">
+      B403
+      &#x00A0;<br />B408
+</div>
+      <!--l. 395--><p class="nopar" > Set the breakpoints at the addresses $403 and $408.
+
+      <div class="verbatim" id="verbatim-16">
+      B
+</div>
+      <!--l. 399--><p class="nopar" > Show the breakpoints.
+
+      <div class="verbatim" id="verbatim-17">
+      B403
+</div>
+      <!--l. 403--><p class="nopar" > Remove the breakpoint at $403.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">J</span> </dt><dd 
+class="description">Call a subroutine.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">G</span> </dt><dd 
+class="description">Go to specified address.
+      <!--l. 409--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Jaddr</span> </dt><dd 
+class="description">JSR to specified address.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">Gaddr</span> </dt><dd 
+class="description">Go to specified address.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">G</span> </dt><dd 
+class="description">Go to address in PC register.</dd></dl>
+      <!--l. 415--><p class="noindent" >The registers are loaded from where they are saved (on the stack) and at the breakpoints
+      SWI instructions are entered. Next the code is executed at the indicated address. The
+      SWI instruction (or RTS for the J command) returns to the monitor, saving the
+      registers.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">H</span> </dt><dd 
+class="description">Calculate HEX expression.
+      <!--l. 422--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Hhexnum</span><span 
+class="cmbsy-10x-x-120">{</span><span 
+class="cmbx-12">(+&#8212;-)hexnum</span><span 
+class="cmbsy-10x-x-120">}</span> </dt><dd 
+class="description">Calculate simple expression in hex with + and -</dd></dl>
+      <!--l. 428--><p class="noindent" >Examples:
+
+      <div class="verbatim" id="verbatim-18">
+      H4444+A5
+      &#x00A0;<br />H4444-44F3
+</div>
+      <!--l. 432--><p class="nopar" >
+      </dd><dt class="description">
+<span 
+class="cmbx-12">P</span> </dt><dd 
+class="description">Put a temporary breakpoint after current instruction and exeucte it,
+      <!--l. 436--><p class="noindent" >P is similar to T, because it usually executes one instruction and returns to the monitor
+      after it. That does not work for jumps though. Normally you use P only with JSR
+      instructions if you want to execute the whole subroutine without single-stepping through
+      it.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">R</span> </dt><dd 
+class="description">Display or modify registers.
+      <!--l. 443--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">R</span> </dt><dd 
+class="description">Register display.
+           </dd><dt class="description">
+      <span 
+class="cmbx-12">Rregvalue</span> </dt><dd 
+class="description">Enter new value into register Supported registers: X,Y,U,S,A,B,D (direct
+           page),P (program counter),C (condition code).</dd></dl>
+      <!--l. 449--><p class="noindent" >The R command uses the saved register values (on the stack). There are some restrictions
+      on changing the S register.
+      <!--l. 452--><p class="noindent" >Examples:
+
+      <div class="verbatim" id="verbatim-19">
+      R
+</div>
+      <!--l. 455--><p class="nopar" > Display all registers.
+
+      <div class="verbatim" id="verbatim-20">
+      RB03
+      &#x00A0;<br />RP4444
+</div>
+      <!--l. 460--><p class="nopar" > Load the B register with $03 and the program counter with $4444.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">T</span> </dt><dd 
+class="description">Single step trace.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">I</span> </dt><dd 
+class="description">Show the contents of one address.
+      <!--l. 467--><p class="noindent" >Syntax:
+           <dl class="description"><dt class="description">
+      <span 
+class="cmbx-12">Iaddr</span> </dt><dd 
+class="description">Display the contents of the given address. (used to read input port)</dd></dl>
+      <!--l. 473--><p class="noindent" >Example:
+
+      <div class="verbatim" id="verbatim-21">
+      &#x00A0;&#x00A0;IE001
+</div>
+      <!--l. 476--><p class="nopar" > Show the ACIA status.</dd></dl>
+<!--l. 480--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">5.1.2   </span> <a 
+ id="x1-120005.1.2"></a>S-Records Related Commands.</h4>
+      <dl class="description"><dt class="description">
+<span 
+class="cmbx-12">S1bytes</span> </dt><dd 
+class="description">Enter Motorola S records.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">S9bytes</span> </dt><dd 
+class="description">Last S record in series.
+      <!--l. 486--><p class="noindent" >S records are usually entered from a file, either ASCII transfer (S command from the
+      v09 prompt) or X-MODEM transfer (XX command in monitor, U command from
+      v09 prompt). Most Motorola cross assemblers generate S records.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">SSaddr,len</span> </dt><dd 
+class="description">Dump memory region as Motorola S records.
+      <!--l. 492--><p class="noindent" >These S records can be loaded later by the monitor program.
+      <!--l. 494--><p class="noindent" >Usually you capture the S records into a file (use L command at v09 prompt) or
+      use XSS instead. The XSS command is the same as SS, except that it outputs the S
+      records through the X-modem protocol (use D command at v09 prompt).
+      </dd><dt class="description">
+<span 
+class="cmbx-12">SOaddr</span> </dt><dd 
+class="description">Set origin address for S-record transfer.
+      <!--l. 501--><p class="noindent" >Before entering S records, it sets the first memory address where S records will be
+      loaded, regardless of the address contained in the S records.
+      <!--l. 504--><p class="noindent" >Before the SS command, it sets the first address that will go into the S records.
+      <!--l. 507--><p class="noindent" >Examples.
+
+      <div class="verbatim" id="verbatim-22">
+      SO800
+      &#x00A0;<br />S1130400etc...
+</div>
+      <!--l. 511--><p class="nopar" > Load the S records at address $800 even though the address in the S records is
+      $400
+
+      <div class="verbatim" id="verbatim-23">
+      SO8000
+      &#x00A0;<br />SS400,100
+</div>
+      <!--l. 517--><p class="nopar" > Save the memory region of 256 bytes starting at $400 as S records. The S records contain
+      addresses starting at $8000.</dd></dl>
+<!--l. 522--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">5.1.3   </span> <a 
+ id="x1-130005.1.3"></a>X-Modem Related Commands.</h4>
+      <dl class="description"><dt class="description">
+<span 
+class="cmbx-12">XLaddr</span> </dt><dd 
+class="description">Load binary data using X-modem protocol
+      <!--l. 527--><p class="noindent" >Example:
+
+      <div class="verbatim" id="verbatim-24">
+      XL400
+</div>
+      <!--l. 530--><p class="nopar" > Type your escape character and at the v09 prompt type
+
+      <div class="verbatim" id="verbatim-25">
+      ubasic
+</div>
+      <!--l. 534--><p class="nopar" > to load the binary file &#8221;basic&#8221; at address $400.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">XSaddr,len</span> </dt><dd 
+class="description">Save binary data using X-modem protocol.
+      <!--l. 539--><p class="noindent" >Example:
+
+      <div class="verbatim" id="verbatim-26">
+      XS400,100
+</div>
+      <!--l. 542--><p class="nopar" > to save the memory region of 128 bytes starting at $400 Type your escape character and at
+      the v09 prompt type:
+
+      <div class="verbatim" id="verbatim-27">
+      dfoo
+</div>
+      <!--l. 547--><p class="nopar" > Now the bytes are saved into the file &#8221;foo&#8221;.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">XSSaddr,len</span> </dt><dd 
+class="description">Save memory region as S records through X-modem protocol.
+      <!--l. 552--><p class="noindent" >See SS command for more details.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">XX</span> </dt><dd 
+class="description">Execute commands received through X-modem protocol This is usually used to receive
+      S-records.
+      <!--l. 557--><p class="noindent" >Example:
+
+      <div class="verbatim" id="verbatim-28">
+      XX
+</div>
+      <!--l. 560--><p class="nopar" > Now press the escape character and at the v09 prompt type
+
+      <div class="verbatim" id="verbatim-29">
+      usfile
+</div>
+      <!--l. 564--><p class="nopar" > where <span 
+class="cmtt-12">sfile </span>is a file with S-records.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">XOnl,eof</span> </dt><dd 
+class="description">Set X-modem text output options, first number type of newline. 1=LF, 2=CR,
+      3=CRLF, second number filler byte at end of file (sensible options include 0,4,1A) These
+      options are used by the XSS command.
+      <!--l. 572--><p class="noindent" >Example: Under a UNIX system you want X-modem&#8217;s text output with just LF and a filler
+      byte of 0. Type:
+
+      <div class="verbatim" id="verbatim-30">
+      XO1,0
+</div>
+      <!--l. 576--><p class="nopar" ></dd></dl>
+<!--l. 579--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">5.2   </span> <a 
+ id="x1-140005.2"></a>Memory Map</h3>
+<!--l. 581--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">5.3   </span> <a 
+ id="x1-150005.3"></a>Operating System Facilities</h3>
+      <dl class="description"><dt class="description">
+<span 
+class="cmbx-12">getchar</span> </dt><dd 
+class="description">address $00.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">putchar</span> </dt><dd 
+class="description">address $03.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">getline</span> </dt><dd 
+class="description">address $06.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">putline</span> </dt><dd 
+class="description">address $09.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">putcr</span> </dt><dd 
+class="description">address $0C.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">getpoll</span> </dt><dd 
+class="description">address $0F.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">xopenin</span> </dt><dd 
+class="description">address $12.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">xopenout</span> </dt><dd 
+class="description">address $15.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">xabortin</span> </dt><dd 
+class="description">address $18.
+
+      </dd><dt class="description">
+<span 
+class="cmbx-12">xclosein</span> </dt><dd 
+class="description">address $1B.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">xcloseout</span> </dt><dd 
+class="description">address $1E.
+      </dd><dt class="description">
+<span 
+class="cmbx-12">delay</span> </dt><dd 
+class="description">address $21. On input the D register contains the number of timer ticks to wait.
+      Each timer tick is 20ms.</dd></dl>
+<!--l. 599--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">5.4   </span> <a 
+ id="x1-160005.4"></a>Extending the built-in Assembler</h3>
+
+   <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;6</span><br /><a 
+ id="x1-170006"></a>The Forth Language.</h2>
+
+   <div class="verbatim" id="verbatim-31">
+kernel09&#x00A0;and&#x00A0;the&#x00A0;*.4&#x00A0;files.&#x00A0;FORTH&#x00A0;for&#x00A0;the&#x00A0;6809.&#x00A0;To&#x00A0;run&#x00A0;it,&#x00A0;type
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;XX
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;Then&#x00A0;press&#x00A0;the&#x00A0;escape&#x00A0;char&#x00A0;and&#x00A0;at&#x00A0;the&#x00A0;v09&#x00A0;prompt&#x00A0;type
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;ukernel09
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;Then&#x00A0;type
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;G400
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;From&#x00A0;FORTH&#x00A0;type
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;XLOAD
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;Then&#x00A0;press&#x00A0;your&#x00A0;escape&#x00A0;char&#x00A0;and&#x00A0;at&#x00A0;the&#x00A0;v09&#x00A0;prompt&#x00A0;type
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;uextend09.4
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;From&#x00A0;FORTH&#x00A0;type
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;XLOAD
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;Then&#x00A0;press&#x00A0;your&#x00A0;escape&#x00A0;char&#x00A0;and&#x00A0;at&#x00A0;the&#x00A0;v09&#x00A0;prompt&#x00A0;type
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;utetris.4
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0; &#x00A0;&#x00A0;&#x00A0;&#x00A0;From&#x00A0;FORTH&#x00A0;type
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;TT
+&#x00A0;<br />
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;And&#x00A0;play&#x00A0;tetris&#x00A0;under&#x00A0;FORTH&#x00A0;on&#x00A0;the&#x00A0;6809!
+</div>
+<!--l. 636--><p class="nopar" >
+
+   <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;7</span><br /><a 
+ id="x1-180007"></a>The BASIC Interpreter.</h2>
+
+   <h2 class="chapterHead"><span class="titlemark">Chapter&#x00A0;8</span><br /><a 
+ id="x1-190008"></a>History of the Project.</h2>
+   <h3 class="sectionHead"><span class="titlemark">8.1   </span> <a 
+ id="x1-200008.1"></a>Introduction.</h3>
+<!--l. 644--><p class="noindent" >Of all the 8-bit home computers only a few had the Motorola 6809 CPU, the most famous of
+which was the Tandy Color Computer. Then there was its clone (from Wales) the Dragon and
+there was an old obscure SuperPet that I have never seen. The 6809 was the 8-bit
+processor finally done right, but it came a bit too late to have a real influence on the
+market.
+<!--l. 650--><p class="indent" >   The book that raised my enthousiasm for the Motorola 6809 processor was: Lance A.
+Leventhal, &#8220;6809 Assembly Language Programming&#8221;, 1981 Osborne/McGrawhill. ISBN
+0-07-931035-4. I borrowed it several times from the university library and finally I bought my
+own copy.
+<!--l. 655--><p class="indent" >   The first sentence on the back of that book reads:
+      <div class="quote">
+      <!--l. 657--><p class="noindent" >While everyone&#8217;s been talking about new 16-bit microprocessors, the 6809 has
+      emerged as <span 
+class="cmti-12">the </span>important new device.</div>
+<!--l. 661--><p class="indent" >   Though it was not the processor that changed the world, it certainly was the processor that
+changed my idea of what a good instruction set should look like. Before that I thought that the
+Z80 was superior to everything else on the planet, at least superior to every other 8-bit
+processor.
+<!--l. 666--><p class="indent" >   It was in April 1987. I borrowed the book for the first time and I had just written a Forth
+interpreter for my Z80 machine. It struck me that the following 7-instruction sequence on a
+Z80
+
+   <div class="verbatim" id="verbatim-32">
+EX&#x00A0;DE,HL
+&#x00A0;<br />LD&#x00A0;E,(HL)
+&#x00A0;<br />INC&#x00A0;HL
+&#x00A0;<br />LD&#x00A0;D,(HL)
+&#x00A0;<br />INC&#x00A0;HL
+&#x00A0;<br />EX&#x00A0;DE,HL
+&#x00A0;<br />JMP&#x00A0;(HL)
+</div>
+<!--l. 677--><p class="nopar" >
+<!--l. 679--><p class="indent" >   could be replaced by just <span 
+class="cmti-12">one </span>instruction on the 6809.
+
+   <div class="verbatim" id="verbatim-33">
+JMP&#x00A0;[,Y++]
+</div>
+<!--l. 682--><p class="nopar" >
+<!--l. 684--><p class="indent" >   BTW the above instructions are the heart of a Forth interpreter and making them more
+efficient has a tremendous effect on efficiency.
+<!--l. 687--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">8.2   </span> <a 
+ id="x1-210008.2"></a>The 6809 Emulator in Forth.</h3>
+<!--l. 689--><p class="noindent" >The years went by and I had bought an XT compatible computer in 1988. I didn&#8217;t buy a 6809
+system though I could have done so. But it would either be too expensive or I would have to
+build it myself (I wasn&#8217;t too handy with soldering) or it would be a primitive machine like the
+Tandy Color Computer without expansions and I didn&#8217;t like to use cassettes and a 32-column
+display.
+<!--l. 696--><p class="indent" >   In 1989 I saw a 6502 simulator at a meeting of our Forth club. One could interactively enter
+hex codes, page through memory, modify registers, trace intructions etc. I just got to have this,
+but for a 6809 instead.
+<!--l. 700--><p class="indent" >   Around Christmas of that year I wrote a 6809 Forth assembler and an interactive simulator,
+like the one I had seen on the club meeting. Everything was written in F-PC, a very
+comprehensive Forth system for the PC.
+<!--l. 705--><p class="indent" >   <hr class="figure"><div class="figure" 
+>
+
+<a 
+ id="x1-210011"></a>
+
+<div class="verbatim" id="verbatim-34">
+&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;&#x00A0;0&#x00A0;&#x00A0;1&#x00A0;&#x00A0;2&#x00A0;&#x00A0;3&#x00A0;&#x00A0;4&#x00A0;&#x00A0;5&#x00A0;&#x00A0;6&#x00A0;&#x00A0;7&#x00A0;&#x00A0;8&#x00A0;&#x00A0;9&#x00A0;&#x00A0;A&#x00A0;&#x00A0;B&#x00A0;&#x00A0;C&#x00A0;&#x00A0;D&#x00A0;&#x00A0;E&#x00A0;&#x00A0;F&#x00A0;0123456789ABCDEF
+&#x00A0;<br />0000&#x00A0;&#x00A0;10&#x00A0;8E&#x00A0;00&#x00A0;40&#x00A0;E6&#x00A0;A0&#x00A0;D7&#x00A0;80&#x00A0;8E&#x00A0;00&#x00A0;81&#x00A0;3A&#x00A0;5D&#x00A0;27&#x00A0;07&#x00A0;A6&#x00A0;...@f&#x00A0;W&#x00A0;...:]&#8217;.&amp;
+&#x00A0;<br />0010&#x00A0;&#x00A0;A0&#x00A0;A7&#x00A0;82&#x00A0;5A&#x00A0;26&#x00A0;F9&#x00A0;7E&#x00A0;FF&#x00A0;FF&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;&#x00A0;&#8217;.Z&amp;y~&#x00A0;&#x00A0;.......
+&#x00A0;<br />0020&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />0030&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />0040&#x00A0;&#x00A0;05&#x00A0;46&#x00A0;4F&#x00A0;52&#x00A0;54&#x00A0;48&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;.FORTH..........
+&#x00A0;<br />0050&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />0060&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />0070&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />0080&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />0090&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />00A0&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />00B0&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />00C0&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />00D0&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />00E0&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />00F0&#x00A0;&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;00&#x00A0;................
+&#x00A0;<br />CC=00000000&#x00A0;&#x00A0;A=$00&#x00A0;B=$00&#x00A0;DP=$00&#x00A0;X=$0000&#x00A0;Y=$0000&#x00A0;U=$0000&#x00A0;S=$0000
+&#x00A0;<br />&#x00A0;&#x00A0;&#x00A0;EFHINZVC&#x00A0;PC=$0000&#x00A0;LDY&#x00A0;#&#x00A0;$0040
+</div>
+<!--l. 726--><p class="nopar" >
+<br /> <div class="caption" 
+><span class="id">Figure&#x00A0;8.1: </span><span  
+class="content">Screen snapshot of the Forth-based 6809 simulator.</span></div><!--tex4ht:label?: x1-210011 -->
+
+<!--l. 728--><p class="indent" >   </div><hr class="endfigure">
+<!--l. 730--><p class="indent" >   I even made a start with writing an implementation of Forth for it, but the obvious lack of
+speed (among other things) witheld me from finishing it. I had a fairly complete set of assembly
+routines though. The estimated speed was around one thousand instructions per second, good for
+an equivalent processor speed of around 4kHz.
+<!--l. 736--><p class="indent" >   In May 1992 I changed my trusted 8MHz Turbo XT for a blistering fast 25MHz 80386
+and it could run the simulator more than 5 times as fast. But then I wasn&#8217;t really
+working on it. In the summer of 1992 I changed to Linux, which I have been using ever
+since.
+<!--l. 741--><p class="indent" >   Around the summer of 1993 I was working with pfe, a brand new Forth system for Unix
+written by Dirk Zoller. It had reached such state of completeness and usability that porting the
+6809 simulator to it would be feasible. I ported it and by doing so I regained interest in the 6809
+processor. PFE is written in C instead of assembler and at least on the 80386 it is considerably
+slower than a Forth written in Assembler, like FPC. My simulated processor speed was
+around 5kHz, nothing to write home about. It was faster than on the XT, but not
+much.
+   <h3 class="sectionHead"><span class="titlemark">8.3   </span> <a 
+ id="x1-220008.3"></a>The Assembler and Simulator in C.</h3>
+<!--l. 752--><p class="noindent" >The switch from Forth to C was caused by the fact that I wanted a traditional 6809 assembler,
+instead of the &#8217;Forth&#8217; assembler, in which the syntax is slightly tweaked to make the thing easy
+to implement in Forth and easy to use within Forth. In the fall of 1993 I wrote a traditional two
+pass assembler in a few days. It worked more or less, but only recently it has become bug-free in
+that it assembles all the instructions and all the addressing modes (even PC relative) without
+error.
+<!--l. 760--><p class="indent" >   Now that I had a real assembler, I could write real 6809 assembly programs, such as a BASIC
+interpreter (maybe kidding) or a monitor program or god knows what. If I would ever run real
+code on that 6809 simulator, I had to increase its speed considerably. So I wrote a very
+straightforward 6809 simulator in C using tables of function pointers. It did really well in
+terms of speed, I could reach an equivalent processor clock speed of around 200kHz.
+The C simulator didn&#8217;t have any fancy display, memory edit or single step functions.
+Its only I/O was through the SWI2 instruction for character output and SWI3 for
+character input, something I had added to the Forth-based simulator quite some time
+ago.
+<!--l. 771--><p class="indent" >   One afternoon in optimized hack mode brought me a crude port of E-Forth, a tiny and very
+slow (most was interpreted, very few assembler words) implementation of Forth. The original was
+written in MASM for the 8086 and other ports (like the 8051) wre already around. That was the
+first time I had Forth on an emulated 6809. BTW this Forth would also run, or should I say
+crawl, on the Forth-based simulator.
+<!--l. 778--><p class="indent" >   I released the assembler, simulator and EForth on <span 
+class="cmtt-12">alt.sources </span>in November 1993.
+<!--l. 781--><p class="indent" >   Of course I also wrote some test and toy programs (what about a program to convert binary
+numbers to decimal using that oddball DAA instruction?).
+
+<!--l. 784--><p class="indent" >   In the spring of 1994 I picked up that old TINY BASIC interpreter written by John Byrns.
+And tiny it was. Not even arrays were supported. I ported it to my simulator and found some
+bugs, both in my simulator and in TINY BASIC itself.
+<!--l. 789--><p class="indent" >   I made some improvements to the 6809 simulator. Now I could send ASCII files to it and log
+the output to another ASCII file. That way I could &#8217;load&#8217; and &#8217;save&#8217; BASIC programs for one
+thing. Further I had a trace facility to write a trace of all the instructions in a certain address
+range to a file. Last I cleaned up the I/O and signal handling somewhat, making it portable
+across several Unix versions.
+<!--l. 796--><p class="indent" >   That version of the software, along with some example programs, was also released on
+<span 
+class="cmtt-12">alt.sources</span>. The assembler implemented includes and conditional assembly in that
+version.
+<!--l. 800--><p class="noindent" >
+   <h3 class="sectionHead"><span class="titlemark">8.4   </span> <a 
+ id="x1-230008.4"></a>The Virtual SBC.</h3>
+<!--l. 802--><p class="noindent" >That blistering fast 80386 that I bought back in 1992 has become slow as molasses. It has
+actually become slower since the memory upgrade with slow memory (it was cheap) that
+necessitated an extra wait state. Fortunately I recently pruchased a Pentium.
+<!--l. 807--><p class="indent" >   At the moment I actually have plans to build (or have somebody build for me) a single board
+computer containing a 6809. I would like to have 32k RAM plus 32k EPROM. I definitely like to
+have a monitor program with the features I want. Hence another project was born,
+the virtual SBC that I could prototype my monitor ROM and some other software
+on.
+<!--l. 813--><p class="indent" >   The virtual SBC emulates a single board computer that communicates with a PC through an
+ACIA. On that PC there runs a simple terminal program that supports XMODEM file transfer.
+Things I recently did.
+      <ul class="itemize1">
+      <li class="itemize">I rewrote the 6809 emulator engine with giant switch statements to hammer out all
+      unnecessary procedure calls and to gain some speed by enabling the compiler to use
+      register variables where appropriate. On my 386 the speed increase was disappointing.
+      The equivalent processor speed is now 250kHz, up from about 170kHz (remember
+      that extra wait state?). On a HPUX workstation, I got a factor of 2 speed increase.
+      That sucker runs at an emulated processor speed of about 3.5MHz. A Pentium-90 is
+      even faster, more than any real 6809 can (officially) run.
+      </li>
+      <li class="itemize">I  added  XMODEM  upload/download  features  to  the  &#8217;terminal  front  end&#8217;  of  the
+      simulator. On the other end of the &#8217;serial link&#8217; a 6809 machine code program runs
+      the other end of the XMODEM file transfer protocol.
+      </li>
+
+      <li class="itemize">I changed the SWI2/SWI3 hack to real ACIA emulation at a port address.
+      </li>
+      <li class="itemize">I write-protected the ROM area.
+      </li>
+      <li class="itemize">I added a 20ms timer interrupt.
+      </li>
+      <li class="itemize">I wrote a monitor program for the virtual SBC that has to followin features.
+           <ul class="itemize2">
+           <li class="itemize">Simple (vectorized) operating system functions, like character I/O line I/O,
+           XMODEM transfer. Usable by application programs.
+           </li>
+           <li class="itemize">a hex/ascii dump command.
+           </li>
+           <li class="itemize">a hex/ascii enter command.
+           </li>
+           <li class="itemize">a hex/ascii memory search command.
+           </li>
+           <li class="itemize">memory move command.
+           </li>
+           <li class="itemize">S-record send and receive capabilities (directly in ASCII or through XMODEM).
+           </li>
+           <li class="itemize">Binary load and save of memory region through XMODEM
+           </li>
+           <li class="itemize">register display and modify.
+           </li>
+           <li class="itemize">go to address (or current program counter) and call subroutine commands.
+           </li>
+           <li class="itemize">breakpoints.
+           </li>
+           <li class="itemize">program step tracing (breakpoint after next instruction), DEBUG P command
+           </li>
+           <li class="itemize">single step tracing (based on timer interrupt). I had to cheat with the emulator
+           to implement this.
+           </li>
+           <li class="itemize">one-pass (no labels) disassembler (DEBUG U command).
+
+           </li>
+           <li class="itemize">line-by-line assembler (DEBUG A command) I wrote this one such that an
+           additional real assembler can use most of the guts of it.</li></ul>
+      </li></ul>
+<!--l. 858--><p class="indent" >   Finally I wrote a real 6809 Forth, based on some other Forth I wrote for an imaginary stack
+machine. Those old dusty primitives that I had written back in 1990 proved very useful now.
+This Forth can load programs through XMODEM too. It can recompile (metacompile) itself and,
+very importantly, it runs tetris! (crawls on the 386) This is the tetris implementation written in
+ANSI Forth by Dirk Zoller and it is used as a test program. Next I have to make this Forth
+ROM-able.
+<!--l. 866--><p class="indent" >   What else will go into that 32k ROM area? The monitor will be around 7k, 1k is reserved for
+the I/O space. Forth (with its own Forth assembler) will take about 12k, 8k without. A few
+additional k could be used for a &#8217;real&#8217; assemler, but I doubt I will ever use that. A cross
+assembler is much more convenient. BASIC no doubt. But I&#8217;m afraid I&#8217;ll have to write it myself,
+more so as I want to have <span 
+class="cmti-12">source code </span>of all my 6809 stuff. I already have the floating point
+routines for it.
+    
+</body></html> 
+
+
+
