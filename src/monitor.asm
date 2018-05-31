@@ -371,7 +371,7 @@ unk		jsr xabortin
 
 * Here are some useful messages.
 welcome		fcb unknown-welcome-1
-		fcc "Welcome to BUGGY version 1.0"
+		fcc "Welcome to BUGGY version 1.0.0"
 unknown		fcb brkmsg-unknown-1
 		fcc "Unknown command"
 brkmsg		fcb clrmsg-brkmsg-1
