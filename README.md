@@ -10,11 +10,12 @@ license: GNU General Public License version 2, see LICENSE for more details.
 
 Forum thread: http://archive.worldofdragon.org/phpBB3/viewtopic.php?f=8&t=4880
 Project: https://github.com/6809/sbc09
-
+Grant's Simple 6809 SBC: http://searle.hostei.com/grant/6809/Simple6809.html
 
 For the usage of the assembler a09 and 6809 single board system v09 
 read doc/sbc09.creole!
 
+I've added sbc09.html and monitor.html to the doc directory.
 
 This distribution includes two different kinds of simulators:
  1. The old sim6809 based "simple" simulator built as v09s, v09st
