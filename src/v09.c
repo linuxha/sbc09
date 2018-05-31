@@ -36,7 +36,7 @@
 
 #include <string.h>
 
-#define VERSION "v09 1.0.1"
+#define VERSION "v09 1.0.2"
 char nom[4096];
 extern int iopage;
 
