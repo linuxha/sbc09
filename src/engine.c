@@ -35,6 +35,7 @@
 Byte aca,acb;
 Byte *breg=&aca,*areg=&acb;
 static int tracetrick=0;
+int iopage = 0xe000;
 
 #define GETWORD(a) (mem[a]<<8|mem[(a)+1])
 #define SETBYTE(a,n) {if(!(a&0x8000))mem[a]=n;}
@@ -122,10 +123,17 @@ static int tracetrick=0;
 
 /* Macros for load and store of accumulators. Can be modified to check
    for port addresses */
+#if defined(NJC)
 #define LOADAC(reg) if((eaddr&0xff00)!=IOPAGE)reg=mem[eaddr];else\
            reg=do_input(eaddr&0xff);
 #define STOREAC(reg) if((eaddr&0xff00)!=IOPAGE)SETBYTE(eaddr,reg)else\
 	   do_output(eaddr&0xff,reg);
+#else
+#define LOADAC(reg) if((eaddr&0xff00)!=iopage)reg=mem[eaddr];else\
+           reg=do_input(eaddr&0xff);
+#define STOREAC(reg) if((eaddr&0xff00)!=iopage)SETBYTE(eaddr,reg)else\
+	   do_output(eaddr&0xff,reg);
+#endif
 
 #define LOADREGS ixreg=xreg;iyreg=yreg;\
  iureg=ureg;isreg=sreg;\

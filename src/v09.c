@@ -38,6 +38,7 @@
 
 #define VERSION "v09 1.0.1"
 char nom[4096];
+extern int iopage;
 
 FILE *tracefile;
 
@@ -55,7 +56,7 @@ void do_trace(void)
 } 
  
 void usage(void) {
-    fprintf(stderr,"%s\nUsage: v09 [-t tracefile [-l addr] [-h addr] ] [-e escchar] [-f filenom.rom] \nDefault filename is v09.rom\n", VERSION);
+    fprintf(stderr,"%s\nUsage: v09 [-t tracefile [-l addr] [-h addr] ] [-e escchar] [-f filenom.rom] [-a 0xE000 ] \nDefault filename is v09.rom\n", VERSION);
     exit(1); 
 }
 
@@ -128,6 +129,9 @@ main(int argc,char *argv[])
    } else if (strcmp(argv[i],"-f") == 0) {
      i++;
      strcpy(nom, argv[i]);
+   } else if (strcmp(argv[i],"-a")==0) {
+     i++;
+     iopage=strtol(argv[i],(char**)0,0);
    } else {
      usage();
    }
