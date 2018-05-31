@@ -1,10 +1,10 @@
-6809 Simulator/Emulator
+# 6809 Simulator/Emulator
 =======================
 
 sbc09 stands for Lennart Benschop 6809 Single Board Computer.
 It contains a assembler and simulator for the Motorola M6809 processor.
 
-copyleft (c) 1994-2014 by the sbc09 team, see AUTHORS for more details.
+copyleft (c) 1994-2018 by the sbc09 team, see AUTHORS for more details.
 license: GNU General Public License version 2, see LICENSE for more details.
 
 
@@ -20,9 +20,31 @@ This distribution includes two different kinds of simulators:
  1. The old sim6809 based "simple" simulator built as v09s, v09st
  2. The 6809 single board system as a stand alone environment built as v09
 
+## License
+GNU General Public License version 2
 
+## Notes
+--------
 
-Structure
+*Updated:* 20180531 - ncherry@linuxha.com
+
+I have found a couple of different versions of this simulator and while all are similar
+there are usually differences and the documentation seems to be out of sync. I intend
+to merge what I can, fix the documentation and modernize the code a bit. I'm not sure
+this is a good or bad idea but if you don't like it you can fork the code. :smile:
+
+This simulator contain 3 program, a09, makerom and v09.
+
+### a09
+A simple assembler, I find it a bit wonky so I won't put too much work into it. I prefer asl.
+
+### makerom
+I'm not exactly sure how this works but it reads standard input as S-records and build ROM image file v09.rom
+
+### v09 :confused:
+This is the actual simulator. There are 3 different versions of it. v09, the old version, v09s - not sure of it's differences yet and v09st which is like v09s but conpiled with Turbo C in mind. Still need to do a bit more digging on this part
+
+## Structure
 ---------
 
 src/
@@ -167,21 +189,35 @@ H is set on VCC but not on real 6809, sim6809 does what?
     swi3        read character from keyboard into register B
     sync        exit simulator
 
+### Help
+```
+$ ./v09 -h
+v09 1.0.1
+Usage: v09 [-t tracefile [-l addr] [-h addr] ] [-e escchar] [-f filenom.rom] 
+Default filename is v09.rom
+```
 
 ### start program
-v09s BINARY
+```
+v09s -f BINARY
+```
 
 ### start program with tracing output on STDOUT
-v09st BINARY
+```
+v09st -f BINARY
+```
 
 ### run program and leave memory dump (64k)
-
-# memory dump in file dump.v09
+#### memory dump in file dump.v09
+```
 v09s -d BINARY 
+```
 
-
+Don't attempt a memory dump, this isn't currently an option. This is one of this *out of sync* document issues.
 
 ### Bugfixes
+
+ * 20180531 - Actually added the -f filename.rom to the options so you can run with files other than v09.rom
 
  * static int index;
    otherwise the global C library function index() is referenced!
