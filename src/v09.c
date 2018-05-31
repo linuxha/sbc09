@@ -34,6 +34,11 @@
 
 #include "v09.h"
 
+#include <string.h>
+
+#define VERSION "v09 1.0.1"
+char nom[4096];
+
 FILE *tracefile;
 
 void do_trace(void)
@@ -49,6 +54,32 @@ void do_trace(void)
                    xreg,yreg,ureg,sreg,*areg,*breg,ccreg);
 } 
  
+void usage(void) {
+    fprintf(stderr,"%s\nUsage: v09 [-t tracefile [-l addr] [-h addr] ] [-e escchar] [-f filenom.rom] \nDefault filename is v09.rom\n", VERSION);
+    exit(1); 
+}
+
+void version(void) {
+    fprintf(stderr,"%s\n", VERSION);
+    exit(1); 
+}
+
+// @TODO: read_nImage(nom) - better error message
+void read_nImage(const char *nom) {
+    FILE *image;
+
+    fprintf(stderr, "Opening %s\n", nom);
+    if((image = fopen(nom,"rb")) == NULL) {
+	perror("v09, image file");
+	exit(2);
+    }
+
+    // @TODO: Fix the load point
+    // Does this always load the image at 0x8000 ?
+    fread(mem+0x8000, 0x8000, 1, image);
+    fclose(image);
+}
+
 read_image()
 {
  FILE *image;
@@ -62,14 +93,6 @@ read_image()
  fclose(image);
 }
 
-void usage(void)
-{
- fprintf(stderr,"Usage: v09 [-t tracefile [-tl addr] "
-                "[-th addr] ]\n[-e escchar] \n");
- exit(1); 
-}
-
-
 #define CHECKARG if(i==argc)usage();else i++;
 
 main(int argc,char *argv[])
@@ -79,6 +102,9 @@ main(int argc,char *argv[])
  int i;
  escchar='\x1d'; 
  tracelo=0;tracehi=0xffff;
+
+ strcpy(nom, "v09.rom");
+
  for(i=1;i<argc;i++) {
     if (strcmp(argv[i],"-t")==0) {
      i++;
@@ -96,7 +122,15 @@ main(int argc,char *argv[])
    } else if (strcmp(argv[i],"-e")==0) {
      i++;
      escchar=strtol(argv[i],(char**)0,0);
-   } else usage();
+   } else if (strcmp(argv[i],"-v") == 0) {
+     i++;
+     version();
+   } else if (strcmp(argv[i],"-f") == 0) {
+     i++;
+     strcpy(nom, argv[i]);
+   } else {
+     usage();
+   }
  }   
  #ifdef MSDOS
  if((mem=farmalloc(65535))==0) { 
@@ -104,7 +138,7 @@ main(int argc,char *argv[])
    exit(2);
  } 
  #endif
- read_image(); 
+ read_nImage(nom); 
  set_term(escchar);
  pcreg=(mem[0xfffe]<<8)+mem[0xffff]; 
  interpr();
