@@ -1,0 +1,12 @@
+I'm using asl to compile this as a09 doesn't like the #EQU_VARIABLEs used in this assembly.
+
+I've added an option to allow me to mv the ACIA from the default of 0xe000 to whatever I
+pass with:
+
+v09 -a 0xA000
+
+The ExBasROM is Grant Searle's port of the CoCo Extended Basic to his Simple 6809 SBC.
+http://searle.hostei.com/grant/6809/Simple6809.html
+Grant uses as9 to assemble that code. I'm pretty sure the code starts at 0xD800 and
+fills the ROM (hence 0xE000 won't work well for the ACIA).
+
