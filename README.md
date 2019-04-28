@@ -1,15 +1,16 @@
 # 6809 Simulator/Emulator
 =======================
 
-sbc09 stands for Lennart Benschop 6809 Single Board Computer.
-It contains a assembler and simulator for the Motorola M6809 processor.
+Sbc09 stands for Lennart Benschop's 6809 Single Board Computer.
+It contains an assembler and simulator for the Motorola M6809 processor.
 
-copyleft (c) 1994-2018 by the sbc09 team, see AUTHORS for more details.
+Copyleft (c) 1994-2018 by the sbc09 team, see AUTHORS for more details.
 license: GNU General Public License version 2, see LICENSE for more details.
 
-
 Forum thread: http://archive.worldofdragon.org/phpBB3/viewtopic.php?f=8&t=4880
+
 Project: https://github.com/6809/sbc09
+
 Grant's Simple 6809 SBC: http://searle.hostei.com/grant/6809/Simple6809.html
 
 For the usage of the assembler a09 and 6809 single board system v09 
@@ -45,16 +46,18 @@ A simple assembler, I find it a bit wonky so I won't put too much work into it. 
 ### makerom
 I'm not exactly sure how this works but it reads standard input as S-records and build ROM image file v09.rom
 
-### v09 :confused:
+### v09
 This is the actual simulator. There are 3 different versions of it. v09, the old version, v09s - not sure of it's differences yet and v09st which is like v09s but conpiled with Turbo C in mind. Still need to do a bit more digging on this part
 
 ## Structure
 ---------
 
 src/
+
   Source for the developement tools and virtual machines ...
 
   a09.c
+
       The 6809 assembler. It's fairly portable (ANSI) C. It works on both
       Unix and DOS (TC2.0).
 
@@ -69,6 +72,7 @@ src/
         and/or relocatable objects.
 
   v09s.c
+
       The (old) 6809 simulator. Loads a binary image (from a09) at adress $100
       and starts executing. SWI2 and SWI3 are for character output/input.
       SYNC stops simulation. When compiling set -DBIG_ENDIAN if your
@@ -76,38 +80,54 @@ src/
       (instead of ANSI line-by-line) input. Works on Unix.
 
   v09stc.c
+
       Same as v09s.c but for Turbo C. Has its own term control.
 
   v09.c
+
   engine.c
+
   io.c
+
       The 6809 single board simulator/emulator v09.
        
   mon2.asm
+
       Monitor progam, alternative version of monitor.asm
       (used in ROM image alt09.rom)
 
   monitor.asm
+
       Monitor progam (used in ROM image v09.rom for v09)
 
   makerom.c
+
       Helper tool to generate ROM images for v09.
 
+as9/
+
+  Grant's as9 assembler (better than a09)
 
 basic/
+
   Basic interpreters ...
 
-  basic.asm
+  - basic.asm
+
       Tiny Basic
-  fbasic.asm
+
+  - fbasic.asm
+
       Tiny Basic with Lennarts floating point routines.
 
 
 doc/
+
   Documentation ...
 
 
 examples/
+
   Several test and benchmark programs, simple routines and some bigger stuff
   like a Forth system (ef09).
 
@@ -116,12 +136,12 @@ examples/
       expressions, like "12 34 + 5 * . " You can make new words like
       " : SQUARED DUP * ; " etc.
 
+as9/
 
 examples_forth/
+
   Forth environment with examples.
   For the 6809 single board system.
-
-
 
 
 Notes on Linux Fedora Core 6
@@ -164,25 +184,25 @@ v09s* Simulator
 ---------------
 
 ### CC register
-
-E F H I N Z V C  Flag
-8 7 6 5 4 3 2 1  Bit
-| | | | | | | |
-| | | | | | | +- $01
-| | | | | | +--- $02
-| | | | | +----- $04
-| | | | +------- $08
-| | | +--------- $10
-| | +----------- $20
-| +------------- $40
-+--------------- $80
-
+```
+        E F H I N Z V C  Flag
+        8 7 6 5 4 3 2 1  Bit
+        | | | | | | | |
+        | | | | | | | +- $01
+        | | | | | | +--- $02
+        | | | | | +----- $04
+        | | | | +------- $08
+        | | | +--------- $10
+        | | +----------- $20
+        | +------------- $40
+        +--------------- $80
+```
 
 # differences from real 6809:
 
-ldd #$0fc9
-addb #$40
-adca #$00
+    ldd #$0fc9
+    addb #$40
+    adca #$00
 
 H is set on VCC but not on real 6809, sim6809 does what?
 
@@ -384,8 +404,40 @@ FFFF FFFF UM* . . FFFE 1 ok
 FFFF FFFE FFFF U/ . . FFFF FFFE ok
 
 
+### mon2.asm commands
 
-
+  - ^] (Ctrl-]  0x1D) Enters Emulator help
+    - L - L<filename> - Log            (W)
+    - S - S<filename> - S              (R)
+    - X - eXit
+    - U - U<filename> - Upload         (R)
+    - D - D<filename> - Download       (W)
+    - R - Reset
+    - ! - Suspend to shell (Like ^Z)
+    - H - Help
+    - ? - Help
+    Note: '*' means that the command is not enabled yet
+  - A - Asm    - Aaddr
+  - B - Break  - B or B<addr>. B displays, B<addr> sets or clears breakpoint
+  - C - Calc   - Chexnum{+|-hexnum}
+  - D - Dump   - D or D<addr> or D<addr>,<length>
+  - E - Enter  - E or E<addr> or E<addr> <bytes> or E<addr>string
+  - F - Find   - Faddr bytes or Faddr",34,"ascii",34,"
+  - G - Go     - G or G<addr> Run 
+  - H - Help   - H
+  - I - Inp    - Iaddr - Inspect
+  - J - Jump   - J<addr>
+  - M - Move   - M<addr1>,<addr2>,<lenght>
+  - P - Prog   - P (like continue, use after J<addr>)
+  - R - Regs   - R or R<letter><hex>
+  - S - Srec   - SO<addr> or SS<addr>,<len> or S1<bytes> or S9<bytes>
+    - SS<addr> - S1 dump
+    - S0/S1/S9 - S1 Load
+  - T - Trace  - T (use after J<addr>)
+  - U - Unasm  - U or Uaddr or Uaddr,length
+  - X - Xmodem - XSaddr,len XLaddr,len XX XOcrlf,filler, XSSaddr,len
+  - Z - User   - user defined
+ - Help - H
 
 Links/References
 ================
@@ -437,7 +489,8 @@ Referenced by:
     6809 specific site will be redirected, but does not exist.
 
     Internet-Archiv:
-    https://web.archive.org/web/20070112041235/http://www.striker.ottawa.on.ca/6809/
+    https://web.archive.org/web/20070112041235/
+    http://www.striker.ottawa.on.ca/6809/
     2014-05-01: Lennart B. lennartb@xs4all.nl has been informed.
 
   http://archive.worldofdragon.org/phpBB3/viewtopic.php?f=5&t=4308&start=60#p9750
